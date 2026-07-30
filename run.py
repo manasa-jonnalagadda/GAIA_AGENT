@@ -114,13 +114,15 @@ def main():
             "model_answer": parsed_ans
         })
         
-    # Save answers to answers.json
+    # Write to answers_test.json in test mode, and answers.json in full run
+    output_file = "answers_test.json" if is_test_mode else "answers.json"
+    
     try:
-        with open("answers.json", "w") as f:
+        with open(output_file, "w") as f:
             json.dump(results, f, indent=2)
-        print(f"\nSaved {len(results)} answers to answers.json successfully.")
+        print(f"\nSaved {len(results)} answers to {output_file} successfully.")
     except Exception as e:
-        print(f"Failed to save answers to answers.json: {e}")
+        print(f"Failed to save answers to {output_file}: {e}")
 
 if __name__ == "__main__":
     main()

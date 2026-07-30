@@ -20,6 +20,11 @@ class FileReaderTool(Tool):
     }
     output_type = "string"
 
+    def __init__(self, model_id=None, api_key=None, **kwargs):
+        super().__init__(**kwargs)
+        self.model_id = model_id
+        self.api_key = api_key
+
     def forward(self, file_path: str) -> str:
         if not os.path.exists(file_path):
             return f"Error: File '{file_path}' does not exist."
@@ -29,13 +34,13 @@ class FileReaderTool(Tool):
         try:
             if ext == ".csv":
                 df = pd.read_csv(file_path)
-                if len(df) <= 100:
+                if len(df) <= 200:
                     return df.to_string()
                 else:
                     return (
                         f"CSV shape: {df.shape}. Columns: {df.columns.tolist()}.\n"
-                        f"First 50 rows:\n{df.head(50).to_string()}\n"
-                        f"Last 10 rows:\n{df.tail(10).to_string()}"
+                        f"First 5 rows:\n{df.head(5).to_string()}\n"
+                        f"Last 5 rows:\n{df.tail(5).to_string()}"
                     )
                     
             elif ext in [".xlsx", ".xls"]:
@@ -45,10 +50,13 @@ class FileReaderTool(Tool):
                 for sheet in sheets:
                     df = pd.read_excel(xls, sheet_name=sheet)
                     result.append(f"Sheet '{sheet}' shape: {df.shape}")
-                    if len(df) <= 50:
+                    if len(df) <= 200:
                         result.append(df.to_string())
                     else:
-                        result.append(f"First 30 rows:\n{df.head(30).to_string()}")
+                        result.append(
+                            f"First 5 rows:\n{df.head(5).to_string()}\n"
+                            f"Last 5 rows:\n{df.tail(5).to_string()}"
+                        )
                 return "\n\n".join(result)
                 
             elif ext == ".pdf":
@@ -74,8 +82,8 @@ class FileReaderTool(Tool):
                 except Exception as e:
                     img_metadata = f"Could not read image metadata: {e}"
                 
-                api_key = os.environ.get("LLM_API_KEY")
-                model_id = os.environ.get("LLM_MODEL_ID", "gpt-4o")
+                api_key = self.api_key or os.environ.get("LLM_API_KEY")
+                model_id = self.model_id or os.environ.get("LLM_MODEL_ID", "gpt-4o")
                 
                 if not api_key:
                     return f"Image read fallback ({img_metadata}) - LLM_API_KEY is not set for image description."
