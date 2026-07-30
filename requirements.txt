@@ -1,0 +1,10 @@
+smolagents[toolkit]
+requests
+pandas
+openpyxl
+litellm
+pypdf
+pillow
+duckduckgo-search
+markdownify
+python-dotenv
