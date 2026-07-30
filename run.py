@@ -1,7 +1,14 @@
 import os
+import sys
 import argparse
 import json
+import io
 from dotenv import load_dotenv
+
+# Ensure Windows console supports UTF-8 to prevent emoji/unicode encode errors
+if sys.platform.startswith("win"):
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 # Load env variables before importing agent (which also loads them)
 load_dotenv()
