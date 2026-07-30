@@ -10,6 +10,10 @@ load_dotenv()
 api_key = os.environ.get("LLM_API_KEY")
 model_id = os.environ.get("LLM_MODEL_ID", "gpt-4o")
 
+# Proactively set HF_TOKEN if the key is a Hugging Face token to ensure full library compatibility
+if api_key and api_key.startswith("hf_"):
+    os.environ["HF_TOKEN"] = api_key
+
 # Instantiate one shared model object and reuse it across agents
 model = LiteLLMModel(
     model_id=model_id,
