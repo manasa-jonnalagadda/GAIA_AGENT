@@ -4,6 +4,7 @@ import argparse
 import json
 import io
 from dotenv import load_dotenv
+from tenacity import retry, stop_after_attempt, wait_chain, wait_fixed, retry_if_exception
 
 # Ensure Windows console supports UTF-8 to prevent emoji/unicode encode errors
 if sys.platform.startswith("win"):
@@ -15,6 +16,32 @@ load_dotenv()
 
 from gaia_api import get_questions, get_file
 from agents import manager_agent
+
+def is_rate_limit_or_capacity_error(exception):
+    """
+    Checks if the exception message indicates a rate limit or capacity issue.
+    """
+    msg = str(exception).lower()
+    targets = ["rate limit", "429", "529", "capacity"]
+    should_retry = any(t in msg for t in targets)
+    return should_retry
+
+def before_sleep_print(retry_state):
+    """
+    Logs before sleeping between retries.
+    """
+    sleep_time = getattr(retry_state.next_action, "sleep", "?")
+    print(f"Rate limit or capacity error detected. Retrying in {sleep_time}s (completed attempt {retry_state.attempt_number})...")
+
+@retry(
+    stop=stop_after_attempt(4),
+    wait=wait_chain(wait_fixed(5), wait_fixed(15), wait_fixed(45)),
+    retry=retry_if_exception(is_rate_limit_or_capacity_error),
+    before_sleep=before_sleep_print,
+    reraise=True
+)
+def run_agent_with_retry(prompt):
+    return manager_agent.run(prompt)
 
 def parse_answer(agent_response):
     """
@@ -107,7 +134,7 @@ def main():
         # Run agent
         try:
             print("Running manager agent...")
-            agent_response = manager_agent.run(prompt)
+            agent_response = run_agent_with_retry(prompt)
         except Exception as e:
             print(f"Error running agent for task {task_id}: {e}")
             agent_response = f"ERROR: {str(e)}"

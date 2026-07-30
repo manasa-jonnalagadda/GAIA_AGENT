@@ -8,3 +8,5 @@ pillow
 duckduckgo-search
 markdownify
 python-dotenv
+tenacity
+
