@@ -47,7 +47,9 @@ def parse_answer(agent_response):
     """
     Parses the agent output to extract only the text after 'FINAL ANSWER:'.
     """
-    if str(agent_response).startswith("ERROR:"):
+    # Ensure agent_response is a string (could be integer or other types returned by final_answer)
+    agent_response = str(agent_response)
+    if agent_response.startswith("ERROR:"):
         return agent_response
     
     target = "FINAL ANSWER:"
