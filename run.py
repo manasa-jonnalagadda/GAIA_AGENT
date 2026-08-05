@@ -147,7 +147,7 @@ def main():
         
         results.append({
             "task_id": task_id,
-            "model_answer": parsed_ans
+            "submitted_answer": parsed_ans
         })
         
     # Write to answers_test.json in test mode, and answers.json in full run
@@ -163,15 +163,19 @@ def main():
 if __name__ == "__main__":
     main()
     
-    # SUBMISSION STEP (Manually triggered)
-    # To submit your answers, uncomment the block below and run:
-    # 
+    # ──────────────────────────────────────────────────────────────────────
+    # SUBMISSION STEP  (run manually when you are ready to score)
+    # ──────────────────────────────────────────────────────────────────────
+    # 1. Make sure answers.json exists from a full run (python run.py)
+    # 2. Uncomment the block below and run this script once more:
+    #
     # from gaia_api import submit_answers
     # import json
     # with open("answers.json", "r") as f:
     #     answers = json.load(f)
     # submit_answers(
-    #     username="your_hf_username",
-    #     agent_code_url="https://github.com/your_username/your_repo",
+    #     username="manasa-jonnalagadda",
+    #     agent_code_url="https://github.com/manasa-jonnalagadda/GAIA_AGENT",
     #     answers=answers
     # )
+    # ──────────────────────────────────────────────────────────────────────
